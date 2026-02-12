@@ -9,64 +9,116 @@ const catImg = document.getElementById("letter-cat");
 const buttons = document.getElementById("letter-buttons");
 const finalText = document.getElementById("final-text");
 
-// Click Envelope
+let dodgeCount = 0;
 
+// Open Envelope
 envelope.addEventListener("click", () => {
     envelope.style.display = "none";
     letter.style.display = "flex";
 
-    setTimeout( () => {
+    setTimeout(() => {
         document.querySelector(".letter-window").classList.add("open");
-    },50);
+    }, 50);
 });
 
-// Logic to move the NO btn
 
-noBtn.addEventListener("mouseover", () => {
-    const min = 200;
-    const max = 200;
+// 🔥 Move NO button (phone + desktop)
+function moveNoButton() {
 
-    const distance = Math.random() * (max - min) + min;
-    const angle = Math.random() * Math.PI * 2;
+    dodgeCount++;
 
-    const moveX = Math.cos(angle) * distance;
-    const moveY = Math.sin(angle) * distance;
+    // Funny text progression
+    if (dodgeCount === 3) noBtn.textContent = "are you sure?";
+    if (dodgeCount === 6) noBtn.textContent = "really sure??";
+    if (dodgeCount === 9) noBtn.textContent = "last chance 😭";
 
-    noBtn.style.transition = "transform 0.3s ease";
-    noBtn.style.transform = `translate(${moveX}px, ${moveY}px)`;
+    const btnWidth = noBtn.offsetWidth;
+    const btnHeight = noBtn.offsetHeight;
+
+    const maxX = window.innerWidth - btnWidth - 20;
+    const maxY = window.innerHeight - btnHeight - 20;
+
+    const randomX = Math.random() * maxX;
+    const randomY = Math.random() * maxY;
+
+    noBtn.style.position = "fixed";
+    noBtn.style.left = randomX + "px";
+    noBtn.style.top = randomY + "px";
+    noBtn.style.transform = "none";
+}
+
+// Desktop hover
+noBtn.addEventListener("mouseenter", moveNoButton);
+
+// Mobile touch (MOST important)
+noBtn.addEventListener("touchstart", (e) => {
+    e.preventDefault();
+    moveNoButton();
+}, { passive: false });
+
+// Backup protection
+noBtn.addEventListener("click", (e) => {
+    e.preventDefault();
+    moveNoButton();
 });
 
-// Logic to make YES btn to grow
 
-// let yesScale = 1;
 
-// yesBtn.style.position = "relative"
-// yesBtn.style.transformOrigin = "center center";
-// yesBtn.style.transition = "transform 0.3s ease";
+// 🎉 CONFETTI FUNCTION (no libraries needed)
+function launchConfetti() {
 
-// noBtn.addEventListener("click", () => {
-//     yesScale += 2;
+    for (let i = 0; i < 120; i++) {
 
-//     if (yesBtn.style.position !== "fixed") {
-//         yesBtn.style.position = "fixed";
-//         yesBtn.style.top = "50%";
-//         yesBtn.style.left = "50%";
-//         yesBtn.style.transform = `translate(-50%, -50%) scale(${yesScale})`;
-//     }else{
-//         yesBtn.style.transform = `translate(-50%, -50%) scale(${yesScale})`;
-//     }
-// });
+        const confetti = document.createElement("div");
 
-// YES is clicked
+        confetti.style.position = "fixed";
+        confetti.style.width = "8px";
+        confetti.style.height = "14px";
+        confetti.style.top = "-20px";
+        confetti.style.left = Math.random() * window.innerWidth + "px";
 
+        confetti.style.backgroundColor =
+            `hsl(${Math.random() * 360}, 100%, 60%)`;
+
+        confetti.style.opacity = Math.random();
+
+        confetti.style.transform =
+            `rotate(${Math.random() * 360}deg)`;
+
+        confetti.style.zIndex = "9999";
+        confetti.style.pointerEvents = "none";
+
+        document.body.appendChild(confetti);
+
+        const fallDuration = Math.random() * 3 + 2;
+
+        confetti.animate([
+            { transform: "translateY(0) rotate(0deg)" },
+            {
+                transform: `translateY(${window.innerHeight + 50}px)
+                            rotate(${Math.random() * 720}deg)`
+            }
+        ], {
+            duration: fallDuration * 1000,
+            easing: "linear"
+        });
+
+        setTimeout(() => confetti.remove(), fallDuration * 1000);
+    }
+}
+
+
+
+// YES clicked
 yesBtn.addEventListener("click", () => {
-    title.textContent = "Yippeeee!";
 
+    launchConfetti(); // 🎉 boom
+
+    title.textContent = "YAYYYYYYYYYY!";
     catImg.src = "cat_dance.gif";
 
     document.querySelector(".letter-window").classList.add("final");
 
     buttons.style.display = "none";
-
     finalText.style.display = "block";
 });
